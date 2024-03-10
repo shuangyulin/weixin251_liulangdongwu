@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dao.XinxifabuLiuyanDao">
+
+
+
+
+
+
+
+
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        a.id as id
+        ,a.xinxifabu_id as xinxifabuId
+        ,a.yonghu_id as yonghuId
+        ,a.shouhou_commentback_text as shouhouCommentbackText
+        ,a.insert_time as insertTime
+        ,a.create_time as createTime
+    </sql>
+    <select id="selectListView" parameterType="map" resultType="com.entity.view.XinxifabuLiuyanView" >
+        SELECT
+        <include refid="Base_Column_List" />
+
+--         级联表的字段
+        ,xinxifabu.xinxifabu_name as xinxifabuName
+        ,xinxifabu.xinxifabu_types as xinxifabuTypes
+        ,xinxifabu.xinxifabu_photo as xinxifabuPhoto
+        ,xinxifabu.xinxifabu_address as xinxifabuAddress
+        ,xinxifabu.chongwu_types as chongwuTypes
+        ,xinxifabu.xinxifabu_time as xinxifabuTime
+        ,xinxifabu.xinxi_types as xinxiTypes
+        ,xinxifabu.xinxifabu_content as xinxifabuContent
+        ,yonghu.yonghu_name as yonghuName
+        ,yonghu.yonghu_id_number as yonghuIdNumber
+        ,yonghu.yonghu_phone as yonghuPhone
+        ,yonghu.yonghu_photo as yonghuPhoto
+
+        FROM xinxifabu_liuyan  a
+        left JOIN xinxifabu xinxifabu ON a.xinxifabu_id = xinxifabu.id
+        left JOIN yonghu yonghu ON a.yonghu_id = yonghu.id
+
+        <where>
+            <if test="params.ids != null">
+                and a.id in
+                <foreach item="item" index="index" collection="params.ids" open="(" separator="," close=")">
+                #{item}
+                </foreach>
+            </if>
+            <if test="params.xinxifabuId != null and params.xinxifabuId != ''">
+                and a.xinxifabu_id = #{params.xinxifabuId}
+            </if>
+            <if test="params.yonghuId != null and params.yonghuId != ''">
+                and a.yonghu_id = #{params.yonghuId}
+            </if>
+            <if test=" params.shouhouCommentbackText != '' and params.shouhouCommentbackText != null and params.shouhouCommentbackText != 'null' ">
+                and a.shouhou_commentback_text like CONCAT('%',#{params.shouhouCommentbackText},'%')
+            </if>
+            <if test=" params.insertTimeStart != '' and params.insertTimeStart != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(a.insert_time) >= UNIX_TIMESTAMP(#{params.insertTimeStart}) ]]>
+            </if>
+            <if test=" params.insertTimeEnd != '' and params.insertTimeEnd != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(a.insert_time) <= UNIX_TIMESTAMP(#{params.insertTimeEnd}) ]]>
+            </if>
+
+            <if test=" params.xinxifabuName != '' and params.xinxifabuName != null and params.xinxifabuName != 'null' ">
+                and xinxifabu.xinxifabu_name like CONCAT('%',#{params.xinxifabuName},'%')
+            </if>
+            <if test="params.xinxifabuTypes != null  and params.xinxifabuTypes != ''">
+                and xinxifabu.xinxifabu_types = #{params.xinxifabuTypes}
+            </if>
+
+            <if test=" params.xinxifabuAddress != '' and params.xinxifabuAddress != null and params.xinxifabuAddress != 'null' ">
+                and xinxifabu.xinxifabu_address like CONCAT('%',#{params.xinxifabuAddress},'%')
+            </if>
+            <if test="params.chongwuTypes != null  and params.chongwuTypes != ''">
+                and xinxifabu.chongwu_types = #{params.chongwuTypes}
+            </if>
+
+            <if test=" params.xinxifabuTimeStart != '' and params.xinxifabuTimeStart != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(xinxifabu.xinxifabu_time) >= UNIX_TIMESTAMP(#{params.xinxifabuTimeStart}) ]]>
+            </if>
+            <if test=" params.xinxifabuTimeEnd != '' and params.xinxifabuTimeEnd != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(xinxifabu.xinxifabu_time) <= UNIX_TIMESTAMP(#{params.xinxifabuTimeEnd}) ]]>
+            </if>
+            <if test="params.xinxiTypes != null  and params.xinxiTypes != ''">
+                and xinxifabu.xinxi_types = #{params.xinxiTypes}
+            </if>
+
+            <if test=" params.xinxifabuContent != '' and params.xinxifabuContent != null and params.xinxifabuContent != 'null' ">
+                and xinxifabu.xinxifabu_content like CONCAT('%',#{params.xinxifabuContent},'%')
+            </if>
+            <if test=" params.yonghuName != '' and params.yonghuName != null and params.yonghuName != 'null' ">
+                and yonghu.yonghu_name like CONCAT('%',#{params.yonghuName},'%')
+            </if>
+            <if test=" params.yonghuIdNumber != '' and params.yonghuIdNumber != null and params.yonghuIdNumber != 'null' ">
+                and yonghu.yonghu_id_number like CONCAT('%',#{params.yonghuIdNumber},'%')
+            </if>
+            <if test=" params.yonghuPhone != '' and params.yonghuPhone != null and params.yonghuPhone != 'null' ">
+                and yonghu.yonghu_phone like CONCAT('%',#{params.yonghuPhone},'%')
+            </if>
+        </where>
+
+        order by a.${params.orderBy} desc 
+    </select>
+
+</mapper>
